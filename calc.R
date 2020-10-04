@@ -8,7 +8,16 @@ dat <- eventReactive({
 
 
 
-output$pop_params = render_dt(pop_params, 'cell')
+output$pop_params = render_dt({
+  colnames(pop_params) = ifelse(str_detect(colnames(pop_params),"_"),
+                                str_replace(colnames(pop_params),"_","\n"),
+                                colnames(pop_params)) 
+  pop_params %>% mutate_if(is.numeric, round,digits = 2)},
+  'cell',options = list(
+    autoWidth = TRUE,
+    columnDefs = list(list(width = '150px',height = "50px", targets = "_all")), 
+    paging = FALSE,searching = FALSE,info = FALSE
+  ),rownames= FALSE)
 observeEvent(input$pop_params_cell_edit, {
   pop_params <<- editData(pop_params, input$pop_params_cell_edit, 'pop_params')
   
@@ -16,7 +25,11 @@ observeEvent(input$pop_params_cell_edit, {
 
 
 
-output$transition_params = render_dt(transition_params, 'cell')
+output$transition_params = render_dt(transition_params %>% mutate_if(is.numeric, round,digits = 2), 'cell',options = list(
+  autoWidth = TRUE,
+  columnDefs = list(list(width = '100px',height = "50px", targets = "_all")), 
+  paging = FALSE,searching = FALSE,info = FALSE
+),rownames= FALSE)
 observeEvent(input$transition_params_cell_edit, {
   transition_params <<- editData(transition_params, input$transition_params_cell_edit, 'transition_params')
   transition_params <<- transition_params %>%
